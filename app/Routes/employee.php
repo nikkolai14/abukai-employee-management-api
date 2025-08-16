@@ -3,9 +3,10 @@
 $basePath = '/api/employees';
 
 return [
-    "$basePath" => ['GET', 'EmployeeController@getEmployees'],
-    "$basePath" => ['POST', 'EmployeeController@createEmployee'],
-    "$basePath/{id}" => ['GET', 'EmployeeController@getEmployeeById'],
-    "$basePath/{id}" => ['PUT', 'EmployeeController@updateEmployee'],
-    "$basePath/{id}" => ['DELETE', 'EmployeeController@deleteEmployee'],
+    // [method, uri, controller@action]
+    ['GET',    "$basePath",           'EmployeeController@getEmployees'],
+    ['POST',   "$basePath",           'EmployeeController@createEmployee'],
+    ['GET',    "$basePath/{id}",      'EmployeeController@getEmployeeById'],
+    ['PUT',    "$basePath/{id}",      'EmployeeController@updateEmployee'],
+    ['DELETE', "$basePath/{id}",      'EmployeeController@deleteEmployee'],
 ];

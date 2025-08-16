@@ -37,10 +37,14 @@ $container = array_merge([
 $router = new Router($container);
 
 // Load routes
-foreach ($routes as $uri => $route) {
-	$method = $route[0];
-	$controllerAction = $route[1];
-	$router->addRoute($uri, $controllerAction, $method);
+foreach ($routes as $route) {
+	// $route: [method, uri, controller@action]
+	if (count($route) === 3) {
+		list($method, $uri, $controllerAction) = $route;
+		$router->addRoute($uri, $controllerAction, $method);
+	}
+
+    throw new \Exception("Route found that does not match expected format", 404);
 }
 
 // Handle the request

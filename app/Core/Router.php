@@ -4,6 +4,7 @@ namespace App\Core;
 
 class Router {
     private $routes = [];
+    private $routePatterns = [];
     private $container = [];
     private $request;
 
@@ -25,17 +26,25 @@ class Router {
     /**
      * Add a route to the router.
      *
-     * @param string $uri The URI pattern.
+     * @param string $uri The URI pattern (may contain {param}).
      * @param string $controllerAction The controller action in 'Controller@action' format.
      * @param string $method The HTTP method (GET, POST, etc.).
      * @return void
      */
     public function addRoute($uri, $controllerAction, $method) {
-        if (isset($this->routes[$method][$uri])) {
-            throw new \Exception("Route $uri already exists", 500);
-        }
+        // Convert URI pattern to regex and extract parameter names
+        $pattern = preg_replace_callback('/\{(\w+)\}/', function ($matches) {
+            return '(?P<' . $matches[1] . '>[^/]+)';
+        }, $uri);
 
-        $this->routes[$method][$uri] = $controllerAction;
+        $pattern = '#^' . $pattern . '$#';
+
+        $this->routes[] = [
+            'method' => $method,
+            'uri' => $uri,
+            'pattern' => $pattern,
+            'controllerAction' => $controllerAction
+        ];
     }
 
     /**
@@ -48,27 +57,27 @@ class Router {
         $uri = $this->request->getUri();
         $method = $this->request->getMethod();
 
-        if (isset($this->routes[$method][$uri])) {
-            $controllerAction = $this->routes[$method][$uri];
+        foreach ($this->routes as $route) {
+            if ($route['method'] === $method && preg_match($route['pattern'], $uri, $matches)) {
+                $controllerAction = $route['controllerAction'];
 
-            // Split controller and action
-            list($controllerName, $action) = explode('@', $controllerAction);
+                list($controllerName, $action) = explode('@', $controllerAction);
 
-            // Assume controllers are in App\\Controllers namespace
-            $controllerClass = "App\\Controllers\\$controllerName";
-            if (!class_exists($controllerClass)) {
-                throw new \Exception("Controller $controllerClass not found", 500);
+                $controllerClass = "App\\Controllers\\$controllerName";
+                if (!class_exists($controllerClass)) {
+                    throw new \Exception("Controller $controllerClass not found", 500);
+                }
+
+                $controller = new $controllerClass($this->container);
+                if (!method_exists($controller, $action)) {
+                    throw new \Exception("Action $action not found in controller $controllerClass", 500);
+                }
+
+                // Extract only named parameters (ignore numeric keys)
+                $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+
+                return call_user_func_array([$controller, $action], $params);
             }
-
-            // Pass the whole container to the controller's constructor
-            // WARNING: For large projects, this could lead to performance issues
-            $controller = new $controllerClass($this->container);
-
-            if (!method_exists($controller, $action)) {
-                throw new \Exception("Action $action not found in controller $controllerClass", 500);
-            }
-
-            return $controller->$action();
         }
 
         throw new \Exception("Route not found", 404);
