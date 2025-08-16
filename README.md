@@ -7,8 +7,8 @@ Abukai's Employee Management API using Native PHP.
    composer install
    ```
 
-2. **Configure Database**
-   Update the `config/database.php` file with your database connection settings.
+2. **Configurations**
+   Copy the `.env.example` file to a new one named `.env` then add your credentials
 
 3. **Run the Application**
    You can use the built-in PHP server to run the application:
@@ -20,10 +20,20 @@ Abukai's Employee Management API using Native PHP.
    You can quickly start a MySQL server using Docker:
 
    ```bash
-   docker run --name employee-mysql -e MYSQL_ROOT_PASSWORD=yourpassword -e MYSQL_DATABASE=employee_db -p 3306:3306 -d mysql:8
+   docker run --name employee-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=abukai_employee_management_db -p 3306:3306 -d mysql:8
    ```
 
-   Replace `yourpassword` and `employee_db` with your desired root password and database name.
+5. **Create Schema**
+   ```
+      CREATE TABLE employees (
+         id INT AUTO_INCREMENT PRIMARY KEY,
+         name VARCHAR(255),
+         email VARCHAR(255) UNIQUE,
+         position VARCHAR(255),
+         salary DECIMAL(10,2),
+         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+   ```
 
-5. **Access the API**
+6. **Access the API**
    Open your browser or use a tool like Postman to access the API at `http://localhost:8000`.
