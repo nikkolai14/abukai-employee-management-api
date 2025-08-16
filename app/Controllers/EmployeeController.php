@@ -15,8 +15,18 @@ class EmployeeController extends BaseController
     protected $employeeModel;
 
     public function __construct($container) {
-        parent::__construct($container['request'], $container['response']);
-        $this->employeeModel = $container['employeeModel'];
+        if (isset($container['request']) && 
+            is_object($container['request']) &&
+            isset($container['response']) && 
+            is_object($container['response']) &&
+            isset($container['employeeModel']) && 
+            is_object($container['employeeModel'])
+        ) {
+            parent::__construct($container['request'], $container['response']);
+            $this->employeeModel = $container['employeeModel'];
+        } else {
+            throw new \Exception("EmployeeController dependencies not found", 500);
+        }
     }
 
     public function createEmployee()
