@@ -15,13 +15,11 @@ class EmployeeController extends BaseController
     protected $employeeModel;
 
     public function __construct($container) {
-        if (isset($container['request']) && 
-            is_object($container['request']) &&
-            isset($container['response']) && 
-            is_object($container['response']) &&
-            isset($container['employeeModel']) && 
-            is_object($container['employeeModel'])
-        ) {
+        if (isset(
+            $container['request'],
+            $container['response'],
+            $container['employeeModel']
+        )) {
             parent::__construct($container['request'], $container['response']);
             $this->employeeModel = $container['employeeModel'];
         } else {

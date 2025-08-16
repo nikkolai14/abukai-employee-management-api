@@ -16,7 +16,7 @@ class Router {
     public function __construct($container = []) {
         $this->container = $container;
 
-        if (isset($container['request']) && is_object($container['request'])) {
+        if (isset($container['request'])) {
             $this->request = $container['request'];
         } else {
             throw new \Exception("Request object not found in container", 500);
