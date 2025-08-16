@@ -36,10 +36,19 @@ class EmployeeModel extends BaseModel {
      *
      * @return array
      */
-    public function getAllEmployees() {
-        $columns = implode(', ', $this->getColumns());
-        $sql = "SELECT $columns FROM employees";
-        return $this->fetchAll($sql);
+    public function getAllEmployees()
+    {
+        $columns = $this->getColumns();
+        $columns_sql = implode(', ', $columns);
+        $sql = "SELECT $columns_sql FROM employees";
+        $rows = $this->fetchAll($sql);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = $this->mapRowToObject($row, $columns);
+        }
+
+        return $result;
     }
 
     /**
@@ -48,11 +57,17 @@ class EmployeeModel extends BaseModel {
      * @param int $id
      * @return array|null
      */
-    public function getEmployeeById($id) {
-        $columns = implode(', ', $this->getColumns());
-        $sql = "SELECT $columns FROM employees WHERE {$this->col_id} = :id";
+    public function getEmployeeById($id)
+    {
+        $columns = $this->getColumns();
+        $columns_sql = implode(', ', $columns);
+        $sql = "SELECT $columns_sql FROM employees WHERE {$this->col_id} = :id";
         $params = ['id' => $id];
-        return $this->fetch($sql, $params);
+        $row = $this->fetch($sql, $params);
+
+        if (!$row) return null;
+
+        return $this->mapRowToObject($row, $columns);
     }
 
     /**
@@ -61,7 +76,8 @@ class EmployeeModel extends BaseModel {
      * @param array $data
      * @return bool
      */
-    public function addEmployee($data) {
+    public function addEmployee($data)
+    {
         $sql = "INSERT INTO employees ({$this->col_name}, {$this->col_position}, {$this->col_salary}) VALUES (:name, :position, :salary)";
         return $this->execute($sql, $data);
     }
@@ -73,7 +89,8 @@ class EmployeeModel extends BaseModel {
      * @param array $data
      * @return bool
      */
-    public function updateEmployee($id, $data) {
+    public function updateEmployee($id, $data)
+    {
         $data['id'] = $id;
         $sql = "UPDATE employees SET {$this->col_name} = :name, {$this->col_position} = :position, {$this->col_salary} = :salary WHERE {$this->col_id} = :id";
         return $this->execute($sql, $data);
@@ -85,7 +102,8 @@ class EmployeeModel extends BaseModel {
      * @param int $id
      * @return bool
      */
-    public function deleteEmployee($id) {
+    public function deleteEmployee($id)
+    {
         $sql = "DELETE FROM employees WHERE {$this->col_id} = :id";
         return $this->execute($sql, ['id' => $id]);
     }

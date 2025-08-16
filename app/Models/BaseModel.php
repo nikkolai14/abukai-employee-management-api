@@ -30,4 +30,19 @@ class BaseModel {
     protected function execute($sql, $params = []) {
         return $this->db->execute($sql, $params);
     }
+
+    /**
+     * Map a row (array) to an object using the provided columns.
+     *
+     * @param array $row
+     * @param array $columns
+     * @return object
+     */
+    protected function mapRowToObject($row, $columns) {
+        $obj = new \stdClass();
+        foreach ($columns as $col) {
+            $obj->{$col} = isset($row[$col]) ? $row[$col] : null;
+        }
+        return $obj;
+    }
 }
