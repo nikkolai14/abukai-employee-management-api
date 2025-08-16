@@ -21,7 +21,7 @@ $response = new Response();
 $database = new Database($dbConfig);
 $employeeModel = new EmployeeModel($database);
 
-// Pass dependencies to router
+// Dependencides
 $container = [
 	'request' => $request,
 	'response' => $response,

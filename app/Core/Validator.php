@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Validations;
+namespace App\Core;
 
 class Validator
 {
     protected $errors = [];
 
-    public function validate(array $data, array $rules)
-    {
+    protected function validate(
+        array $data = [],
+        array $rules = []
+    ) {
         foreach ($rules as $field => $rule) {
             $value = $data[$field] ?? null;
             $this->applyRule($field, $value, $rule);
         }
-
-        return empty($this->errors);
     }
 
     protected function applyRule($field, $value, $rule)
@@ -30,7 +30,18 @@ class Validator
             $this->errors[$field][] = "$field must be an integer.";
         }
 
-        // Add more validation rules as needed
+        if (strpos($rule, 'email') !== false && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+            $this->errors[$field][] = "$field must be a valid email address.";
+        }
+
+        if (strpos($rule, 'position_number') !== false && (!is_numeric($value) || $value <= 0)) {
+            $this->errors[$field][] = "$field must be a positive number.";
+        }
+    }
+
+    public function passes()
+    {
+        return empty($this->errors);
     }
 
     public function errors()
