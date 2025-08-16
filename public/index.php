@@ -4,13 +4,13 @@ require_once '../vendor/autoload.php';
 
 $dbConfig = require __DIR__ . '/../config/database.php';
 $routes = require __DIR__ . '/../app/Routes/index.php';
+$modelFactories = require __DIR__ . '/../app/Models/index.php';
 
 use Dotenv\Dotenv;
 use App\Core\Router;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\Database;
-use App\Models\EmployeeModel;
 
 $dotenv = Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
@@ -21,14 +21,18 @@ $response = new Response();
 
 // Database config
 $database = new Database($dbConfig);
-$employeeModel = new EmployeeModel($database);
+
+// Load models
+$models = [];
+foreach ($modelFactories as $key => $factory) {
+    $models[$key] = $factory($database);
+}
 
 // Dependencides
-$container = [
-	'request' => $request,
-	'response' => $response,
-	'employeeModel' => $employeeModel
-];
+$container = array_merge([
+    'request' => $request,
+    'response' => $response,
+], $models);
 
 $router = new Router($container);
 
