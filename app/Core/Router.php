@@ -4,18 +4,22 @@ namespace App\Core;
 
 class Router {
     private $routes = [];
+    private $container = [];
     private $request;
-    private $response;
 
     /**
      * Router constructor.
      *
-     * @param object $request The request object.
-     * @param object $response The response object.
+     * @param array $container Container for shared dependencies.
      */
-    public function __construct($request, $response) {
-        $this->request = $request;
-        $this->response = $response;
+    public function __construct($container = []) {
+        $this->container = $container;
+
+        if (isset($container['request']) && is_object($container['request'])) {
+            $this->request = $container['request'];
+        } else {
+            throw new \Exception("Request object not found in container", 500);
+        }
     }
 
     /**
@@ -56,20 +60,23 @@ class Router {
             // Split controller and action
             list($controllerName, $action) = explode('@', $controllerAction);
 
-            // Assume controllers are in App\Controllers namespace
+            // Assume controllers are in App\\Controllers namespace
             $controllerClass = "App\\Controllers\\$controllerName";
             if (!class_exists($controllerClass)) {
-                throw new Exception("Controller $controllerClass not found", 500);
+                throw new \Exception("Controller $controllerClass not found", 500);
             }
 
-            $controller = new $controllerClass($this->request, $this->response);
+            // Pass the whole container to the controller's constructor
+            // WARNING: For large projects, this could lead to performance issues
+            $controller = new $controllerClass($this->container);
+
             if (!method_exists($controller, $action)) {
-                throw new Exception("Action $action not found in controller $controllerClass", 500);
+                throw new \Exception("Action $action not found in controller $controllerClass", 500);
             }
 
             return $controller->$action();
         }
 
-        throw new Exception("Route not found", 404);
+        throw new \Exception("Route not found", 404);
     }
 }

@@ -1,10 +1,14 @@
 <?php
+
 require_once '../vendor/autoload.php';
+$dbConfig = require __DIR__ . '/../config/database.php';
 
 use Dotenv\Dotenv;
 use App\Core\Router;
 use App\Core\Request;
 use App\Core\Response;
+use App\Core\Database;
+use App\Models\EmployeeModel;
 
 $dotenv = Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
@@ -13,8 +17,17 @@ $dotenv->load();
 $request = new Request();
 $response = new Response();
 
-// Initialize the router
-$router = new Router($request, $response);
+// Database config
+$database = new Database($dbConfig);
+$employeeModel = new EmployeeModel($database);
+
+// Pass dependencies to router
+$container = [
+	'request' => $request,
+	'response' => $response,
+	'employeeModel' => $employeeModel
+];
+$router = new Router($container);
 
 // Define routes
 $router->get('/api/employees', 'EmployeeController@getEmployees');

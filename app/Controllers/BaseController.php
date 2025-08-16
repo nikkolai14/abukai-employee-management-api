@@ -2,13 +2,18 @@
 
 namespace App\Controllers;
 
+use App\Core\Request;
+use App\Core\Response;
+
 class BaseController
 {
-    protected $request;
-    protected $response;
+    protected Request $request;
+    protected Response $response;
 
-    public function __construct($request, $response)
-    {
+    public function __construct(
+        Request $request,
+        Response $response
+    ) {
         $this->request = $request;
         $this->response = $response;
     }

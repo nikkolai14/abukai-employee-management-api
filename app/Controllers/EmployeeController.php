@@ -2,13 +2,21 @@
 
 namespace App\Controllers;
 
-use App\Controllers\BaseController;
 
+use App\Controllers\BaseController;
+use App\Models\EmployeeModel;
+use App\Core\Request;
+use App\Core\Response;
 class EmployeeController extends BaseController
 {
-    public function __construct($request, $response)
-    {
-        parent::__construct($request, $response);
+    /**
+     * @var EmployeeModel
+     */
+    protected $employeeModel;
+
+    public function __construct($container) {
+        parent::__construct($container['request'], $container['response']);
+        $this->employeeModel = $container['employeeModel'];
     }
 
     public function createEmployee()
