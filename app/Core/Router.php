@@ -23,25 +23,19 @@ class Router {
     }
 
     /**
-     * Register a GET route.
+     * Add a route to the router.
      *
      * @param string $uri The URI pattern.
-     * @param string $controllerAction The controller and action in 'Controller@action' format.
+     * @param string $controllerAction The controller action in 'Controller@action' format.
+     * @param string $method The HTTP method (GET, POST, etc.).
      * @return void
      */
-    public function get($uri, $controllerAction) {
-        $this->routes['GET'][$uri] = $controllerAction;
-    }
+    public function addRoute($uri, $controllerAction, $method) {
+        if (isset($this->routes[$method][$uri])) {
+            throw new \Exception("Route $uri already exists", 500);
+        }
 
-    /**
-     * Register a POST route.
-     *
-     * @param string $uri The URI pattern.
-     * @param string $controllerAction The controller and action in 'Controller@action' format.
-     * @return void
-     */
-    public function post($uri, $controllerAction) {
-        $this->routes['POST'][$uri] = $controllerAction;
+        $this->routes[$method][$uri] = $controllerAction;
     }
 
     /**

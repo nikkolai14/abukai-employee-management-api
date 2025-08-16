@@ -1,7 +1,9 @@
 <?php
 
 require_once '../vendor/autoload.php';
+
 $dbConfig = require __DIR__ . '/../config/database.php';
+$routes = require __DIR__ . '/../app/Routes/index.php';
 
 use Dotenv\Dotenv;
 use App\Core\Router;
@@ -27,14 +29,15 @@ $container = [
 	'response' => $response,
 	'employeeModel' => $employeeModel
 ];
+
 $router = new Router($container);
 
-// Define routes
-$router->get('/api/employees', 'EmployeeController@getEmployees');
-$router->post('/api/employees', 'EmployeeController@createEmployee');
-$router->get('/api/employees/{id}', 'EmployeeController@getEmployeeById');
-$router->put('/api/employees/{id}', 'EmployeeController@updateEmployee');
-$router->delete('/api/employees/{id}', 'EmployeeController@deleteEmployee');
+// Load routes
+foreach ($routes as $uri => $route) {
+	$method = $route[0];
+	$controllerAction = $route[1];
+	$router->addRoute($uri, $controllerAction, $method);
+}
 
 // Handle the request
 $router->resolve();
