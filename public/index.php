@@ -38,9 +38,9 @@ $router = new Router($container);
 
 // Load routes
 foreach ($routes as $route) {
-	if (count($route) === 3) {
-		list($method, $uri, $controllerAction) = $route;
-		$router->addRoute($uri, $controllerAction, $method);
+	if (count($route) >= 3) {
+		list($method, $uri, $controllerAction, $middleware) = $route;
+		$router->addRoute($uri, $controllerAction, $method, $middleware);
 		continue;
 	}
 

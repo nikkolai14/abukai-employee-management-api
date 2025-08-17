@@ -24,14 +24,15 @@ class Router {
     }
 
     /**
-     * Add a route to the router.
+     * Add a route to the router with optional middleware.
      *
      * @param string $uri The URI pattern (may contain {param}).
      * @param string $controllerAction The controller action in 'Controller@action' format.
      * @param string $method The HTTP method (GET, POST, etc.).
+     * @param array $middleware Array of middleware callables/classes.
      * @return void
      */
-    public function addRoute($uri, $controllerAction, $method) {
+    public function addRoute($uri, $controllerAction, $method, $middleware = []) {
         // Convert URI pattern to regex and extract parameter names
         $pattern = preg_replace_callback('/\{(\w+)\}/', function ($matches) {
             return '(?P<' . $matches[1] . '>[^/]+)';
@@ -43,7 +44,8 @@ class Router {
             'method' => $method,
             'uri' => $uri,
             'pattern' => $pattern,
-            'controllerAction' => $controllerAction
+            'controllerAction' => $controllerAction,
+            'middleware' => $middleware
         ];
     }
 
@@ -60,6 +62,7 @@ class Router {
         foreach ($this->routes as $route) {
             if ($route['method'] === $method && preg_match($route['pattern'], $uri, $matches)) {
                 $controllerAction = $route['controllerAction'];
+                $middlewareStack = $route['middleware'] ?? [];
 
                 list($controllerName, $action) = explode('@', $controllerAction);
 
@@ -76,7 +79,28 @@ class Router {
                 // Extract only named parameters (ignore numeric keys)
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
 
-                return call_user_func_array([$controller, $action], $params);
+                // Build the middleware pipeline
+                $coreHandler = function($request) use ($controller, $action, $params) {
+                    return call_user_func_array([$controller, $action], $params);
+                };
+
+                $pipeline = array_reduce(
+                    $middlewareStack,
+                    function ($next, $middleware) {
+                        return function($request) use ($middleware, $next) {
+                            $middlewareClass = "App\\Middlewares\\$middleware";
+                            if (is_string($middleware) && class_exists($middlewareClass)) {
+                                $middlewareInstance = new $middlewareClass();
+                                return $middlewareInstance->handle($request, $next);
+                            } else {
+                                throw new \Exception("Invalid middleware", 500);
+                            }
+                        };
+                    },
+                    $coreHandler
+                );
+
+                return $pipeline($this->request);
             }
         }
 
