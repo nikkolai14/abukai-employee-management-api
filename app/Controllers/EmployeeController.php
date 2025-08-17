@@ -47,16 +47,16 @@ class EmployeeController extends BaseController
             $record = $this->employeeModel->getEmployeeByEmail($data['email']);
 
             if ($record) {
-                return $this->response::error('Employee already exists', 409);
+                return $this->response->error('Employee already exists', 409);
             }
 
             $this->employeeModel->addEmployee($data);
 
             $response = ['status' => 'success'];
 
-            $this->response::success($response, 201);
+            return $this->response->success($response, 201);
         } catch (\Exception $e) {
-            $this->response::error($e->getMessage(), 500);
+            return $this->response->error($e->getMessage(), 500);
         }
     }
 
@@ -88,10 +88,10 @@ class EmployeeController extends BaseController
         $records = $this->employeeModel->getAllEmployees($filters);
 
         if (empty($records)) {
-            return $this->response::error('No employees found', 404);
+            return $this->response->error('No employees found', 404);
         }
 
-        return $this->response::success($records);
+        return $this->response->success($records);
     }
 
     /**
@@ -105,10 +105,10 @@ class EmployeeController extends BaseController
         $record = $this->employeeModel->getEmployeeById($id);
 
         if (!$record) {
-            return $this->response::error('Employee not found', 404);
+            return $this->response->error('Employee not found', 404);
         }
 
-        return $this->response::success($record);
+        return $this->response->success($record);
     }
 
     /**
@@ -122,7 +122,7 @@ class EmployeeController extends BaseController
         try {
             $record = $this->employeeModel->getEmployeeById($id);
             if (!$record) {
-                return $this->response::error('Employee not found', 404);
+                return $this->response->error('Employee not found', 404);
             }
 
             $data['name'] = $this->request->getPostData('name');
@@ -132,9 +132,9 @@ class EmployeeController extends BaseController
 
             $this->employeeModel->updateEmployee($id, $data);
 
-            return $this->response::success(['status' => 'success']);
+            return $this->response->success(['status' => 'success']);
         } catch (\Exception $e) {
-            return $this->response::error($e->getMessage(), 500);
+            return $this->response->error($e->getMessage(), 500);
         }
     }
 
@@ -149,14 +149,14 @@ class EmployeeController extends BaseController
         try {
             $record = $this->employeeModel->getEmployeeById($id);
             if (!$record) {
-                return $this->response::error('Employee not found', 404);
+                return $this->response->error('Employee not found', 404);
             }
 
             $this->employeeModel->deleteEmployee($id);
 
-            return $this->response::success(['status' => 'success']);
+            return $this->response->success(['status' => 'success']);
         } catch (\Exception $e) {
-            return $this->response::error($e->getMessage(), 500);
+            return $this->response->error($e->getMessage(), 500);
         }
     }
 }

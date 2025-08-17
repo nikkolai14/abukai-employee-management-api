@@ -20,8 +20,7 @@ class EmployeeValidation {
         $validator->validate($data, $rules);
 
         if (! $validator->passes()) {
-            Response::errors($validator->errors(), 422);
-            exit;
+            return (new Response())->errors($validator->errors(), 422);
         }
 
         return $next($request);

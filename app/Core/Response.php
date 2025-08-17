@@ -26,9 +26,9 @@ class Response
      * @param int $status The HTTP status code (default 400).
      * @return void
      */
-    public static function error($message, $status = 400)
+    public function error($message, $status = 400)
     {
-        self::json(['error' => $message], $status);
+        return self::json(['error' => $message], $status);
     }
 
     /**
@@ -38,9 +38,9 @@ class Response
      * @param int $status The HTTP status code (default 400).
      * @return void
      */
-    public static function errors($data, $status = 400)
+    public function errors($data, $status = 400)
     {
-        self::json(['errors' => $data], $status);
+        return self::json(['errors' => $data], $status);
     }
 
     /**
@@ -50,8 +50,8 @@ class Response
      * @param int $status The HTTP status code (default 200).
      * @return void
      */
-    public static function success($data, $status = 200)
+    public function success($data, $status = 200)
     {
-        self::json(['data' => $data], $status);
+        return self::json(['data' => $data], $status);
     }
 }
