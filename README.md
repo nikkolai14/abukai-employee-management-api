@@ -37,3 +37,10 @@ Abukai's Employee Management API using Native PHP.
 
 6. **Access the API**
    Open your browser or use a tool like Postman to access the API at `http://localhost:8000`.
+
+7. **Run Tests**
+   Run the following command to execute all tests:
+
+   ```bash
+   composer test
+   ```
