@@ -13,15 +13,7 @@ class Request
     public function __construct()
     {
         $this->queryParams = $_GET;
-        if ($this->getMethod() === 'POST') {
-            $this->postData = $_POST;
-        } elseif ($this->getMethod() === 'PUT' || $this->getMethod() === 'PATCH') {
-            $rawInput = file_get_contents('php://input');
-            parse_str($rawInput, $putData);
-            $this->postData = $putData;
-        } else {
-            $this->postData = [];
-        }
+        $this->postData = $this->getParsedBodyData();
     }
 
     /**
@@ -92,5 +84,23 @@ class Request
     public function getMethod()
     {
         return $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    }
+
+    /**
+     * Parse and return the request body data based on HTTP method.
+     *
+     * @return array The parsed body data.
+     */
+    private function getParsedBodyData()
+    {
+        if ($this->getMethod() === 'POST') {
+            return $_POST;
+        } elseif ($this->getMethod() === 'PUT' || $this->getMethod() === 'PATCH') {
+            $rawInput = file_get_contents('php://input');
+            parse_str($rawInput, $putData);
+            return $putData;
+        } else {
+            return [];
+        }
     }
 }
