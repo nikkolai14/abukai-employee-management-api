@@ -15,6 +15,8 @@ class EmployeeModel extends BaseModel {
     protected $col_salary = 'salary';
     protected $col_created_at = 'created_at';
 
+    private $limit = 10;
+
     /**
      * Get all column names as an array
      *
@@ -36,12 +38,30 @@ class EmployeeModel extends BaseModel {
      *
      * @return array
      */
-    public function getAllEmployees()
+    public function getAllEmployees($filters = [])
     {
         $columns = $this->getColumns();
         $columns_sql = implode(', ', $columns);
         $sql = "SELECT $columns_sql FROM employees";
-        $rows = $this->fetchAll($sql);
+
+        // Apply filters if any
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $sql .= " WHERE {$this->col_name} LIKE :search OR {$this->col_position} LIKE :search";
+            $params['search'] = "%$search%";
+        }
+
+        $limit = !empty($filters['limit']) ? (int) $filters['limit'] : $this->limit;
+        $offset = 0;
+
+        if (!empty($filters['page'])) {
+            $page = (int) $filters['page'];
+            $offset = ($page - 1) * $limit;
+        }
+
+        $sql .= " LIMIT $limit OFFSET $offset";
+
+        $rows = $this->fetchAll($sql, $params ?? []);
 
         $result = [];
         foreach ($rows as $row) {

@@ -51,7 +51,25 @@ class EmployeeController extends BaseController
 
     public function getEmployees()
     {
-        $records = $this->employeeModel->getAllEmployees();
+        $search = $this->request->getQueryParam('search', null);
+        $limit = $this->request->getQueryParam('limit', null);
+        $page = $this->request->getQueryParam('page', 1);
+
+        $filters = [];
+
+        if (!empty($search)) {
+            $filters['search'] = $search;
+        }
+
+        if (!empty($limit)) {
+            $filters['limit'] = $limit;
+        }
+
+        if (!empty($page)) {
+            $filters['page'] = $page;
+        }
+
+        $records = $this->employeeModel->getAllEmployees($filters);
 
         if (empty($records)) {
             return $this->response::error('No employees found', 404);
