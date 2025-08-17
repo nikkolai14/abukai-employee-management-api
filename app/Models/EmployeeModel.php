@@ -47,8 +47,9 @@ class EmployeeModel extends BaseModel {
         // Apply filters if any
         if (!empty($filters['search'])) {
             $search = $filters['search'];
-            $sql .= " WHERE {$this->col_name} LIKE :search OR {$this->col_position} LIKE :search";
-            $params['search'] = "%$search%";
+            $sql .= " WHERE {$this->col_name} LIKE :search_name OR {$this->col_position} LIKE :search_position";
+            $params['search_name'] = "%$search%";
+            $params['search_position'] = "%$search%";
         }
 
         $limit = !empty($filters['limit']) ? (int) $filters['limit'] : $this->limit;
