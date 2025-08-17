@@ -1,6 +1,6 @@
 <?php
 
-$employees = require_once __DIR__ . '/employees.php';
+$employees = require_once __DIR__ . '/employee.php';
 
 $routes = array_merge(
     $employees
