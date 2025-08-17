@@ -2,6 +2,8 @@
 
 namespace App\Core;
 
+use PDO;
+
 class Database {
     private $host;
     private $db;
