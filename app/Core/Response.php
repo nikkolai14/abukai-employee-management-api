@@ -32,6 +32,18 @@ class Response
     }
 
     /**
+     * Send a JSON errors response and terminate the script.
+     *
+     * @param array $errors The array of error messages.
+     * @param int $status The HTTP status code (default 400).
+     * @return void
+     */
+    public static function errors($data, $status = 400)
+    {
+        self::json(['errors' => $data], $status);
+    }
+
+    /**
      * Send a JSON success response and terminate the script.
      *
      * @param mixed $data The data to include in the response.
