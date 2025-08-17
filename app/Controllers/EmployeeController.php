@@ -2,11 +2,9 @@
 
 namespace App\Controllers;
 
-
 use App\Controllers\BaseController;
 use App\Models\EmployeeModel;
-use App\Core\Request;
-use App\Core\Response;
+
 class EmployeeController extends BaseController
 {
     /**
@@ -29,26 +27,84 @@ class EmployeeController extends BaseController
 
     public function createEmployee()
     {
+        try {
+            $data['name'] = $this->request->getPostData('name');
+            $data['email'] = $this->request->getPostData('email');
+            $data['position'] = $this->request->getPostData('position');
+            $data['salary'] = $this->request->getPostData('salary');
 
+            $record = $this->employeeModel->getEmployeeByEmail($data['email']);
+
+            if ($record) {
+                return $this->response::error('Employee already exists', 409);
+            }
+
+            $this->employeeModel->addEmployee($data);
+
+            $response = ['status' => 'success'];
+
+            $this->response::success($response, 201);
+        } catch (\Exception $e) {
+            $this->response::error($e->getMessage(), 500);
+        }
     }
 
-    public function getEmployes()
+    public function getEmployees()
     {
+        $records = $this->employeeModel->getAllEmployees();
 
+        if (empty($records)) {
+            return $this->response::error('No employees found', 404);
+        }
+
+        return $this->response::success($records);
     }
 
-    public function getEmployeeById()
+    public function getEmployeeById($id)
     {
+        $record = $this->employeeModel->getEmployeeById($id);
 
+        if (!$record) {
+            return $this->response::error('Employee not found', 404);
+        }
+
+        return $this->response::success($record);
     }
 
     public function updateEmployee($id)
     {
+        try {
+            $record = $this->employeeModel->getEmployeeById($id);
+            if (!$record) {
+                return $this->response::error('Employee not found', 404);
+            }
 
+            $data['name'] = $this->request->getPostData('name');
+            $data['email'] = $this->request->getPostData('email');
+            $data['position'] = $this->request->getPostData('position');
+            $data['salary'] = $this->request->getPostData('salary');
+
+            $this->employeeModel->updateEmployee($id, $data);
+
+            return $this->response::success(['status' => 'success']);
+        } catch (\Exception $e) {
+            return $this->response::error($e->getMessage(), 500);
+        }
     }
 
     public function deleteEmployee($id)
     {
+        try {
+            $record = $this->employeeModel->getEmployeeById($id);
+            if (!$record) {
+                return $this->response::error('Employee not found', 404);
+            }
 
+            $this->employeeModel->deleteEmployee($id);
+
+            return $this->response::success(['status' => 'success']);
+        } catch (\Exception $e) {
+            return $this->response::error($e->getMessage(), 500);
+        }
     }
 }
