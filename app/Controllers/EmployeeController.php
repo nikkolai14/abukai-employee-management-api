@@ -12,6 +12,12 @@ class EmployeeController extends BaseController
      */
     protected $employeeModel;
 
+    /**
+     * EmployeeController constructor.
+     *
+     * @param array $container Dependency container with 'request', 'response', and 'employeeModel'.
+     * @throws \Exception If dependencies are missing.
+     */
     public function __construct($container) {
         if (isset(
             $container['request'],
@@ -25,6 +31,11 @@ class EmployeeController extends BaseController
         }
     }
 
+    /**
+     * Create a new employee record.
+     *
+     * @return void
+     */
     public function createEmployee()
     {
         try {
@@ -49,6 +60,11 @@ class EmployeeController extends BaseController
         }
     }
 
+    /**
+     * Retrieve a list of employees, optionally filtered by search, limit, and page.
+     *
+     * @return \App\Core\Response
+     */
     public function getEmployees()
     {
         $search = $this->request->getQueryParam('search', null);
@@ -78,6 +94,12 @@ class EmployeeController extends BaseController
         return $this->response::success($records);
     }
 
+    /**
+     * Retrieve a single employee by ID.
+     *
+     * @param int $id Employee ID
+     * @return \App\Core\Response
+     */
     public function getEmployeeById($id)
     {
         $record = $this->employeeModel->getEmployeeById($id);
@@ -89,6 +111,12 @@ class EmployeeController extends BaseController
         return $this->response::success($record);
     }
 
+    /**
+     * Update an existing employee's information.
+     *
+     * @param int $id Employee ID
+     * @return \App\Core\Response
+     */
     public function updateEmployee($id)
     {
         try {
@@ -110,6 +138,12 @@ class EmployeeController extends BaseController
         }
     }
 
+    /**
+     * Delete an employee by ID.
+     *
+     * @param int $id Employee ID
+     * @return \App\Core\Response
+     */
     public function deleteEmployee($id)
     {
         try {
