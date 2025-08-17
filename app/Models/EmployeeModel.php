@@ -71,6 +71,25 @@ class EmployeeModel extends BaseModel {
     }
 
     /**
+     * Get an employee by email.
+     *
+     * @param string $email
+     * @return array|null
+     */
+    public function getEmployeeByEmail($email)
+    {
+        $columns = $this->getColumns();
+        $columns_sql = implode(', ', $columns);
+        $sql = "SELECT $columns_sql FROM employees WHERE {$this->col_email} = :email";
+        $params = ['email' => $email];
+        $row = $this->fetch($sql, $params);
+
+        if (!$row) return null;
+
+        return $this->mapRowToObject($row, $columns);
+    }
+
+    /**
      * Add a new employee.
      *
      * @param array $data
@@ -78,7 +97,7 @@ class EmployeeModel extends BaseModel {
      */
     public function addEmployee($data)
     {
-        $sql = "INSERT INTO employees ({$this->col_name}, {$this->col_position}, {$this->col_salary}) VALUES (:name, :position, :salary)";
+        $sql = "INSERT INTO employees ({$this->col_name}, {$this->col_email}, {$this->col_position}, {$this->col_salary}) VALUES (:name, :email, :position, :salary)";
         return $this->execute($sql, $data);
     }
 
@@ -92,7 +111,7 @@ class EmployeeModel extends BaseModel {
     public function updateEmployee($id, $data)
     {
         $data['id'] = $id;
-        $sql = "UPDATE employees SET {$this->col_name} = :name, {$this->col_position} = :position, {$this->col_salary} = :salary WHERE {$this->col_id} = :id";
+        $sql = "UPDATE employees SET {$this->col_name} = :name, {$this->col_email} = :email, {$this->col_position} = :position, {$this->col_salary} = :salary WHERE {$this->col_id} = :id";
         return $this->execute($sql, $data);
     }
 
