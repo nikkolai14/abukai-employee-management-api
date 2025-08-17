@@ -3,7 +3,7 @@
 $basePath = '/api/employees';
 
 return [
-    // [method, uri, controller@action]
+    // [method, uri, controller@action, middleware]
     ['GET',    "$basePath",           'EmployeeController@getEmployees', []],
     ['POST',   "$basePath",           'EmployeeController@createEmployee', ['EmployeeValidation']],
     ['GET',    "$basePath/{id}",      'EmployeeController@getEmployeeById', []],
