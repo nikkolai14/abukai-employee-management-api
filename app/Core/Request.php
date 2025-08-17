@@ -6,16 +6,22 @@ class Request
 {
     private $queryParams;
     private $postData;
-    private $headers;
 
     /**
-     * Request constructor. Initializes query parameters, post data, and headers from the global scope.
+     * Request constructor. Initializes query parameters and post data.
      */
     public function __construct()
     {
         $this->queryParams = $_GET;
-        $this->postData = $_POST;
-        $this->headers = getallheaders();
+        if ($this->getMethod() === 'POST') {
+            $this->postData = $_POST;
+        } elseif ($this->getMethod() === 'PUT' || $this->getMethod() === 'PATCH') {
+            $rawInput = file_get_contents('php://input');
+            parse_str($rawInput, $putData);
+            $this->postData = $putData;
+        } else {
+            $this->postData = [];
+        }
     }
 
     /**
