@@ -43,18 +43,6 @@ class Request
     }
 
     /**
-     * Get a request header by key.
-     *
-     * @param string $key The header key.
-     * @param mixed $default The default value if the header does not exist.
-     * @return mixed The value of the header or default if not set.
-     */
-    public function getHeader($key, $default = null)
-    {
-        return isset($this->headers[$key]) ? $this->headers[$key] : $default;
-    }
-
-    /**
      * Get all query parameters.
      *
      * @return array The array of all query parameters.
@@ -72,16 +60,6 @@ class Request
     public function getAllPostData()
     {
         return $this->postData;
-    }
-
-    /**
-     * Get all request headers.
-     *
-     * @return array The array of all request headers.
-     */
-    public function getAllHeaders()
-    {
-        return $this->headers;
     }
 
     /**
